@@ -30,7 +30,7 @@ insert :: LogMessage -> MessageTree -> MessageTree
 insert (Unknown _) mt = mt
 insert msg Leaf = Node Leaf msg Leaf
 insert msg@(LogMessage _ ts _) (Node lmt tmsg@(LogMessage _ tst _) rmt)
-    | ts < tst = Node (insert msg lmt) tmsg rmt
+    | ts <= tst = Node (insert msg lmt) tmsg rmt
     | ts > tst = Node lmt tmsg (insert msg rmt)
 
 
@@ -48,9 +48,11 @@ inOrder (Node lmt msg rmt) = inOrder lmt ++ [msg] ++ inOrder rmt
 
 -- Exercise 5
 whatWentWrong :: [LogMessage] -> [String]
-whatWentWrong [] = []
-whatWentWrong logs = case inOrder (build logs) of
-    (x: xs) -> addError x ++ whatWentWrong xs
-        where
-            addError (LogMessage (Error severity) _ content) = if severity >= 50 then [content] else []
-            addError x = []
+whatWentWrong log = appendErrors (inOrder (build log))
+    where
+        appendErrors [] = []
+        appendErrors (x: xs) = addError x ++ appendErrors xs
+                where
+                    addError (LogMessage (Error severity) _ content) = if severity >= 50 then [content] else []
+                    addError x = []
+
