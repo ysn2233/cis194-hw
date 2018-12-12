@@ -21,16 +21,17 @@ localMaxima arr = []
 -- Exercise 3 Histogram
 data Count = Count Int Int   
 
-occurance :: Eq a => [a] -> a -> Integer
-occurance (x:xs) y = if x == y then (1 + occurance xs x) else occurance xs y 
-occurance _ _ = 0
+occ :: Eq a => [a] -> a -> Integer
+occ (x:xs) y = if x == y then (1 + occ xs x) else occ xs y 
+occ _ _ = 0
 
-occurList x = [occurance x n | n <- [0..9]]
+star :: Integer -> String -> String
+star x s = (if x > 0 then '*' else ' '):s
 
-drawStar :: Integer -> String -> String
-drawStar x str = (if x > 0 then '*' else ' '):str
+line :: [Integer] -> String
+line o
+    | all (<=0) o = "==========\n0123456789"
+    | otherwise = foldr star ('\n': (line (map (subtract 1) o))) o
 
 histogram :: [Integer] -> String
-histogram occ
-    | all (<=0) occ = "==========\n0123456789"
-    | otherwise = foldr drawStar ('\n': (drawLine (map (subtract 1) occ))) occ
+histogram x = line [occ x n | n <- [0..9]]
